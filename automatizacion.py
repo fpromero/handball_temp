@@ -9,10 +9,25 @@ import pandas as pd
 import numpy as np
 import math
 
-
-df = pd.read_csv("berabera-gijon.csv", sep="\t")
+data_path = "C:/Users/FranciscoP.Romero/Desktop/BERABERA/"
+file_name = "berabera-elche"
+df = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 teams = df["Equipo"].unique()
 match = df["Partido"].unique()[0]
+# local y visitante
+pos_0 = match.find(teams[0])
+pos_1 = match.find(teams[1])
+if (pos_1 == -1 or (pos_0 != -1 and pos_0 < pos_1)):
+    local_team = teams[0]
+    visit_team = teams[1]
+else: 
+    local_team = teams[1]
+    visit_team = teams[0]
+
+
+##
+# DICCIONARIOS
+##
 
 columns_out = ["Match", "Team", "Player", "Role", "Score", "Score5",
                "9mGoal",   "9mSave", "9mOut", "9mBlock",
@@ -49,7 +64,9 @@ dict_acc = {"Asistencia":"Assist", "Buena Defensa": "GoodDef",
 df_out = pd.DataFrame(columns= columns_out)
 
 
-
+## 
+# FUNCIONES
+## 
 def truncate(numero, cifras = 1):
     posiciones = pow(10.0, cifras)
     return math.trunc(posiciones * numero) / posiciones
@@ -61,25 +78,32 @@ def create_row(match, team, player, role, columns):
 
 
 def detect_scoring_actions(actions, match, team, df_out):
-    for a in actions:
-        pos = a.find(":")
-        player =  a[: pos]
-        accion = a[pos + 1: ]
-        col = dict_acc.get(accion)
-        if (df_out[df_out.Player == player].shape[0] == 0):
-            df_out_aux=create_row(match,team, player, "FP", columns_out)
-            df_out = pd.concat([df_out_aux, df_out], sort = True)
-        # contar jugada
-        df_out.loc[df_out['Player']== player, col] +=1
+    for act in actions:
+        a_lst = act.split(",")
+        for a in a_lst:
+            pos = a.find(":")
+            player =  a[: pos].strip()
+            accion = a[pos + 1: ]
+            ## borrar etiquetado ocasional
+            accion = accion.strip("[")
+            accion = accion.strip("]")
+            col = dict_acc.get(accion)
+            if (df_out[df_out.Player == player].shape[0] == 0):
+                df_out_aux=create_row(match,team, player, "FP", columns_out)
+                df_out = pd.concat([df_out_aux, df_out], sort = True)
+            # contar jugada
+            df_out.loc[df_out['Player']== player, col] +=1
     return df_out
+
 
 
 def register_action(df, col, role, df_out):
     for i, f in df.iterrows():
-        if (df_out[df_out.Player == f['Jugador/a']].shape[0] == 0):
-            df_out_aux=create_row(f['Partido'],f['Equipo'],f['Jugador/a'], role, columns_out)
+        player = f['Jugador/a'].strip()
+        if (df_out[df_out.Player == player].shape[0] == 0):
+            df_out_aux=create_row(f['Partido'],f['Equipo'],player, role, columns_out)
             df_out = pd.concat([df_out_aux, df_out], sort = True)
-        df_out.loc[df_out['Player']==f['Jugador/a'] , col] += 1
+        df_out.loc[df_out['Player'] == player , col] += 1
     return df_out
 
 
@@ -93,11 +117,12 @@ for a in actions:
     #player 
     dfActGoal_players = dfActGoal.groupby(['Partido','Equipo', 'Jugador/a'])['Partido','Equipo', 'Jugador/a'].size().reset_index(name='counts')
     for i, f in dfActGoal_players.iterrows():
-        if (df_out[df_out.Player == f['Jugador/a']].shape[0] == 0):
-            df_out_aux=create_row(f['Partido'],f['Equipo'],f['Jugador/a'], "FP", columns_out)
+        player = f['Jugador/a'].strip()
+        if (df_out[df_out.Player == player].shape[0] == 0):
+            df_out_aux=create_row(f['Partido'],f['Equipo'],player, "FP", columns_out)
     #df_out_aux = pd.DataFrame([[f['Partido'], f['Equipo'], f['Jugador/a']],0], columns=columns)
             df_out = pd.concat([df_out_aux, df_out])
-        df_out.loc[df_out['Player']==f['Jugador/a'] , col] = f['counts']
+        df_out.loc[df_out['Player']== player , col] = f['counts']
     # goalkeeper
     dfActGoal_gk = dfActGoal.groupby(['Partido','Equipo','Portero/a'])['Partido','Equipo','Portero/a'].size().reset_index(name='counts')
     for i, f in dfActGoal_gk.iterrows():
@@ -118,10 +143,11 @@ for a in actions_save:
     dfSaveAct = dfSave[dfSave["Zona Accion"].str.startswith(a[1])]
     df_players = dfSaveAct.groupby(['Partido','Equipo', 'Jugador/a'])['Partido','Equipo', 'Jugador/a'].size().reset_index(name='counts')
     for i, f in df_players.iterrows():
-        if (df_out[df_out.Player == f['Jugador/a']].shape[0] == 0):
-            df_out_aux=create_row(f['Partido'],f['Equipo'],f['Jugador/a'], "FP", columns_out)
+        player = f['Jugador/a'].strip()
+        if (df_out[df_out.Player == player].shape[0] == 0):
+            df_out_aux=create_row(f['Partido'],f['Equipo'],player, "FP", columns_out)
             df_out = pd.concat([df_out_aux, df_out], sort = True)
-        df_out.loc[df_out['Player']==f['Jugador/a'] , col] = f['counts']
+        df_out.loc[df_out['Player']== player , col] = f['counts']
     # goalkeeper
     df_gk = dfSaveAct.groupby(['Partido','Equipo','Portero/a'])['Partido','Equipo','Portero/a'].size().reset_index(name='counts')
     for i, f in df_gk.iterrows():
@@ -140,10 +166,11 @@ for a in actions_out:
     dfOutAct = dfOut[dfOut["Zona Accion"].str.startswith(a[1])]
     df_players = dfOutAct.groupby(['Partido','Equipo', 'Jugador/a'])['Partido','Equipo', 'Jugador/a'].size().reset_index(name='counts')
     for i, f in df_players.iterrows():
-        if (df_out[df_out.Player == f['Jugador/a']].shape[0] == 0):
-            df_out_aux=create_row(f['Partido'],f['Equipo'],f['Jugador/a'], "FP", columns_out)
+        player = f['Jugador/a'].strip()
+        if (df_out[df_out.Player == player].shape[0] == 0):
+            df_out_aux=create_row(f['Partido'],f['Equipo'],player, "FP", columns_out)
             df_out = pd.concat([df_out_aux, df_out], sort = True)
-        df_out.loc[df_out['Player']==f['Jugador/a'] , col] = f['counts']
+        df_out.loc[df_out['Player']==player , col] = f['counts']
     # goalkeeper
     df_gk = dfOutAct.groupby(['Partido','Equipo','Portero/a'])['Partido','Equipo','Portero/a'].size().reset_index(name='counts')
     for i, f in df_gk.iterrows():
@@ -161,10 +188,11 @@ for a in actions_out:
     df_act = df_pos[df_pos["Zona Accion"].str.startswith(a[1])]
     df_players = df_act.groupby(['Partido','Equipo', 'Jugador/a'])['Partido','Equipo', 'Jugador/a'].size().reset_index(name='counts')
     for i, f in df_players.iterrows():
-        if (df_out[df_out.Player == f['Jugador/a']].shape[0] == 0):
-            df_out_aux=create_row(f['Partido'],f['Equipo'],f['Jugador/a'], "FP", columns_out)
+        player = f['Jugador/a'].strip()
+        if (df_out[df_out.Player == player].shape[0] == 0):
+            df_out_aux=create_row(f['Partido'],f['Equipo'],player, "FP", columns_out)
             df_out = pd.concat([df_out_aux, df_out], sort = True)
-        df_out.loc[df_out['Player']==f['Jugador/a'] , col] = f['counts']
+        df_out.loc[df_out['Player']== player , col] = f['counts']
     # goalkeeper
     df_gk = df_act.groupby(['Partido','Equipo','Portero/a'])['Partido','Equipo','Portero/a'].size().reset_index(name='counts')
     for i, f in df_gk.iterrows():
@@ -175,8 +203,8 @@ for a in actions_out:
                 df_out = pd.concat([df_out_aux, df_out], sort = True)
             df_out.loc[df_out['Player']==f['Portero/a'] , col] = f['counts']
 
-df_out = detect_scoring_actions(df[df["SC Local"].notnull()]['SC Local'], match , teams[0], df_out)
-df_out = detect_scoring_actions(df[df["SC Visitante"].notnull()]['SC Visitante'], match ,teams[1], df_out)
+df_out = detect_scoring_actions(df[df["SC Local"].notnull()]['SC Local'], match , local_team, df_out)
+df_out = detect_scoring_actions(df[df["SC Visitante"].notnull()]['SC Visitante'], match ,visit_team, df_out)
 
 
 dfTurnover = df[df.Posesion.notnull()]
@@ -185,7 +213,6 @@ df_out = register_action(dfTurnover, "Turnover", "FP", df_out)
 
 dfSanciones = df[df.Sanciones.notnull()]
 dfSanciones = dfSanciones[dfSanciones.Sanciones.str.startswith('[Exclusion]')]
-
 df_out = register_action(dfSanciones, "2mJ", "FP", df_out)
 
 # POST - PROCESSING : sort, infer dtypes, fillna, reset_index
@@ -202,4 +229,4 @@ df_out['Score'][df_out.Role == "GK"] = (df_out[columns_out[5:]][df_out.Role == "
 df_out['Score5'] = ((df_out['Score'] * 5) / df_out['Score'].max()).apply(truncate)
 df_out['Score'] = df_out['Score'].apply(truncate)
 
-df_out.to_excel("berabera-gijon_scoring.xls", columns = columns_out)
+df_out.to_excel(data_path + file_name + "_scoring.xls", columns = columns_out)
