@@ -10,7 +10,7 @@ import math
 
 
 
-data_path = "C:/Users/FranciscoP.Romero/OneDrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/"
+data_path = "C:/Users/FranciscoP.Romero/Onedrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/"
 file_name = "Alcobendas-Berabera"
 df = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 teams = df["Equipo"].unique()
@@ -30,7 +30,7 @@ else:
 # DICCIONARIOS
 ##
 
-columns_out = ["Match", "Team", "Player", "Role", "Score", "Score5",
+columns_out = ["Match", "Team", "Player", "Role", "Score", "Score5", "PlusMinus"
                "9mGoal",   "9mSave", "9mOut", "9mBlock",
                "6mGoal", "6mSave", "6mOut",
                "FBGoal" ,  "FBSave", "FBOut",
