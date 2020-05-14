@@ -6,11 +6,12 @@ Created on Tue May  5 07:25:01 2020
 """
 
 import pandas as pd
-import numpy as np
 import math
 
-data_path = "C:/Users/FranciscoP.Romero/Desktop/BERABERA/"
-file_name = "berabera-elche"
+
+
+data_path = "C:/Users/FranciscoP.Romero/OneDrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/"
+file_name = "Alcobendas-Berabera"
 df = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 teams = df["Equipo"].unique()
 match = df["Partido"].unique()[0]
@@ -79,11 +80,19 @@ def create_row(match, team, player, role, columns):
 
 def detect_scoring_actions(actions, match, team, df_out):
     for act in actions:
+        # control multiple action to a single player
+        num_players = act.count(":")
+        num_actions = act.count(",")
+        if (num_players == 1 and  num_actions > 0): 
+            player = act[: act.find(":")].strip()
+            pos_comma = act.find(",")
+            act = act[:pos_comma + 1] + player + ":" + act[pos_comma + 1: ]
+        ## processing
         a_lst = act.split(",")
         for a in a_lst:
             pos = a.find(":")
             player =  a[: pos].strip()
-            accion = a[pos + 1: ]
+            accion = a[pos + 1: ].strip()
             ## borrar etiquetado ocasional
             accion = accion.strip("[")
             accion = accion.strip("]")
@@ -203,6 +212,10 @@ for a in actions_out:
                 df_out = pd.concat([df_out_aux, df_out], sort = True)
             df_out.loc[df_out['Player']==f['Portero/a'] , col] = f['counts']
 
+
+
+
+
 df_out = detect_scoring_actions(df[df["SC Local"].notnull()]['SC Local'], match , local_team, df_out)
 df_out = detect_scoring_actions(df[df["SC Visitante"].notnull()]['SC Visitante'], match ,visit_team, df_out)
 
@@ -229,4 +242,4 @@ df_out['Score'][df_out.Role == "GK"] = (df_out[columns_out[5:]][df_out.Role == "
 df_out['Score5'] = ((df_out['Score'] * 5) / df_out['Score'].max()).apply(truncate)
 df_out['Score'] = df_out['Score'].apply(truncate)
 
-df_out.to_excel(data_path + file_name + "_scoring.xls", columns = columns_out)
+df_out[columns_out].to_excel(data_path + file_name + "_scoring.xls", columns = columns_out)
