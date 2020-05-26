@@ -9,9 +9,8 @@ import pandas as pd
 import math
 
 
-
-data_path = "C:/Users/FranciscoP.Romero/Onedrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/"
-file_name = "Alcobendas-Berabera"
+data_path = "C:/Users/FranciscoP.Romero/Onedrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/datos/"
+file_name = "BeraBera-Gijon"
 df = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 teams = df["Equipo"].unique()
 match = df["Partido"].unique()[0]
@@ -29,15 +28,17 @@ else:
 ##
 # DICCIONARIOS
 ##
-
-columns_out = ["Match", "Team", "Player", "Role", "Score", "Score5", "PlusMinus"
-               "9mGoal",   "9mSave", "9mOut", "9mBlock",
+columns_id = ["Match", "Team", "Player", "Role"]
+columns_score = ["Score", "Score5", "ScorePos", "ScoreNeg", "ScoreAttack", "ScoreDef"] 
+columns_kpi =  ["9mGoal",   "9mSave", "9mOut", "9mBlock",
                "6mGoal", "6mSave", "6mOut",
                "FBGoal" ,  "FBSave", "FBOut",
                "7mGoal", "7mSave", "7mOut",
                "Assist", "Received7m", "Provoke2m", "Steal","GoodDef", "Block",
                "Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"
                ]
+columns_out = columns_id + columns_score + columns_kpi
+              
 
 w = [1.5, -0.75, -1, -1,
            1, -0.7, -0.8,
@@ -46,6 +47,28 @@ w = [1.5, -0.75, -1, -1,
            0.5, 1, 0.8, 1, 0.8, 0.8,
            -0.8, -0.8, -0.8, -2, -2
            ]
+
+cols_pos = ["9mGoal", "6mGoal", "FBGoal", "7mGoal", "Assist", "Received7m", "Provoke2m", "Steal","GoodDef", "Block"]
+w_pos = [1.5, 1, 1, 1, 0.5, 1, 0.8, 1, 0.8, 0.8]
+cols_neg = ["9mSave", "9mOut", "9mBlock", "6mSave", "6mOut", "FBSave", "FBOut",
+            "7mSave", "7mOut", "Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"]
+w_neg = [-0.75, -1, -1, -0.7, -0.8, -1.5, -1.5, -1.3, -1.3, -0.8, -0.8, -0.8, -2, -2]
+cols_attack = ["9mGoal",   "9mSave", "9mOut", "9mBlock",
+               "6mGoal", "6mSave", "6mOut",
+               "FBGoal" ,  "FBSave", "FBOut",
+               "7mGoal", "7mSave", "7mOut",
+               "Assist", "Received7m", "Provoke2m",  "Turnover"]
+w_attack = [1.5, -0.75, -1, -1,
+           1, -0.7, -0.8,
+           1, -1.5, -1.5, 
+           1, -1.3, -1.3,
+           0.5, 1, 0.8, -0.8]
+cols_def = ["Steal", "GoodDef", "Block", "DefMistake", "2mJ", "2mBB", "RedBlueCard"]
+w_def = [1, 0.8, 0.8, -0.8, -0.8, -2, -2]
+
+
+
+
 
 w_gk = [-1, 1, 0.5, 0.5,
            -0.6, 1.5, 1,
@@ -97,11 +120,12 @@ def detect_scoring_actions(actions, match, team, df_out):
             accion = accion.strip("[")
             accion = accion.strip("]")
             col = dict_acc.get(accion)
-            if (df_out[df_out.Player == player].shape[0] == 0):
-                df_out_aux=create_row(match,team, player, "FP", columns_out)
-                df_out = pd.concat([df_out_aux, df_out], sort = True)
-            # contar jugada
-            df_out.loc[df_out['Player']== player, col] +=1
+            if (col is not None):
+                if (df_out[df_out.Player == player].shape[0] == 0):
+                    df_out_aux=create_row(match,team, player, "FP", columns_out)
+                    df_out = pd.concat([df_out_aux, df_out], sort = True)
+                # contar jugada
+                df_out.loc[df_out['Player']== player, col] +=1
     return df_out
 
 
@@ -213,9 +237,6 @@ for a in actions_out:
             df_out.loc[df_out['Player']==f['Portero/a'] , col] = f['counts']
 
 
-
-
-
 df_out = detect_scoring_actions(df[df["SC Local"].notnull()]['SC Local'], match , local_team, df_out)
 df_out = detect_scoring_actions(df[df["SC Visitante"].notnull()]['SC Visitante'], match ,visit_team, df_out)
 
@@ -235,11 +256,32 @@ df_out = df_out.fillna(0) # problema con los 7mGoal
 df_out = df_out.reset_index()
 
 # SCORING
-weights = pd.Series(w, index=columns_out[6:])
-weights_gk= pd.Series(w_gk, index=columns_out[6:])
-df_out['Score'][df_out.Role == "FP"] = (df_out[columns_out[5:]][df_out.Role == "FP"] * weights).sum(1)
-df_out['Score'][df_out.Role == "GK"] = (df_out[columns_out[5:]][df_out.Role == "GK"] * weights_gk).sum(1)
+
+weights = pd.Series(w, index=columns_kpi)
+weights_pos = pd.Series(w_pos, index = cols_pos)
+weights_neg = pd.Series(w_neg, index = cols_neg)
+
+weights_gk= pd.Series(w_gk, index=columns_kpi)
+
+df_out['Score'][df_out.Role == "FP"] = (df_out[columns_kpi][df_out.Role == "FP"] * weights).sum(1)
+df_out['Score'][df_out.Role == "GK"] = (df_out[columns_kpi][df_out.Role == "GK"] * weights_gk).sum(1)
 df_out['Score5'] = ((df_out['Score'] * 5) / df_out['Score'].max()).apply(truncate)
+
+
+df_out['ScorePos'][df_out.Role == "FP"] = (df_out[cols_pos][df_out.Role == "FP"] * weights_pos).sum(1)
+df_out['ScoreNeg'][df_out.Role == "FP"] = (df_out[cols_neg][df_out.Role == "FP"] * weights_neg).sum(1)
+
+weights_attack = pd.Series(w_attack, index = cols_attack)
+weights_def = pd.Series(w_def, index = cols_def)
+df_out['ScoreAttack'][df_out.Role == "FP"] = (df_out[cols_attack][df_out.Role == "FP"] * weights_attack).sum(1)
+df_out['ScoreDef'][df_out.Role == "FP"] = (df_out[cols_def][df_out.Role == "FP"] * weights_def).sum(1)
+
+
+# truncate TODO reducir
 df_out['Score'] = df_out['Score'].apply(truncate)
+df_out['ScorePos'] = df_out['ScorePos'].apply(truncate)
+df_out['ScoreNeg'] = df_out['ScoreNeg'].apply(truncate)
+df_out['ScoreAttack'] = df_out['ScoreAttack'].apply(truncate)
+df_out['ScoreDef'] = df_out['ScoreDef'].apply(truncate)
 
 df_out[columns_out].to_excel(data_path + file_name + "_scoring.xls", columns = columns_out)
