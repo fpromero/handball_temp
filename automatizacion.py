@@ -10,7 +10,7 @@ import math
 
 
 data_path = "C:/Users/FranciscoP.Romero/Onedrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/datos/"
-file_name = "BeraBera-Gijon"
+file_name = "BeraBera-Elche"
 df = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 teams = df["Equipo"].unique()
 match = df["Partido"].unique()[0]
@@ -67,9 +67,9 @@ cols_def = ["Steal", "GoodDef", "Block", "DefMistake", "2mJ", "2mBB", "RedBlueCa
 w_def = [1, 0.8, 0.8, -0.8, -0.8, -2, -2]
 
 
-
-
-
+cols_gk_pos =  ["9mSave", "9mOut", "9mBlock", "6mSave", "6mOut", "FBSave", "FBOut",
+            "7mSave", "7mOut","Assist", "Received7m", "Provoke2m", "Steal"]
+cols_gk_neg = ["9mGoal", "6mGoal", "FBGoal", "7mGoal","Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"]
 w_gk = [-1, 1, 0.5, 0.5,
            -0.6, 1.5, 1,
            -0.5, 1.5, 1.5, 
@@ -77,7 +77,8 @@ w_gk = [-1, 1, 0.5, 0.5,
            0.85, 1, 0.8, 1, 0, 0,
            -0.8, -0.8, -0.8, -2, -2
            ]
-
+weights_gk_pos= pd.Series(list( filter(lambda w_gk: w_gk > 0, w_gk) ), index=cols_gk_pos)
+weights_gk_neg= pd.Series(list( filter(lambda w_gk: w_gk < 0, w_gk) ), index=cols_gk_neg)
 
 dict_acc = {"Asistencia":"Assist", "Buena Defensa": "GoodDef", 
             "Error Defensa": "DefMistake", "Provoca 2'": "Provoke2m",
@@ -269,7 +270,10 @@ df_out['Score5'] = ((df_out['Score'] * 5) / df_out['Score'].max()).apply(truncat
 
 
 df_out['ScorePos'][df_out.Role == "FP"] = (df_out[cols_pos][df_out.Role == "FP"] * weights_pos).sum(1)
+df_out['ScorePos'][df_out.Role == "GK"] = (df_out[cols_gk_pos][df_out.Role == "GK"] * weights_gk_pos).sum(1)
+
 df_out['ScoreNeg'][df_out.Role == "FP"] = (df_out[cols_neg][df_out.Role == "FP"] * weights_neg).sum(1)
+df_out['ScoreNeg'][df_out.Role == "GK"] = (df_out[cols_gk_neg][df_out.Role == "GK"] * weights_gk_neg).sum(1)
 
 weights_attack = pd.Series(w_attack, index = cols_attack)
 weights_def = pd.Series(w_def, index = cols_def)
