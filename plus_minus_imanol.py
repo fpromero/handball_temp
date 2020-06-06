@@ -7,7 +7,7 @@ Created on Thu May 14 14:13:42 2020
 import pandas as pd 
 import math
 data_path = "C:/Users/FranciscoP.Romero/Onedrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/datos/"
-file_name = "BeraBera-Elche"
+file_name = "GRANOLLERS-BERABERA"
 df = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 
 team = "BERA BERA"
@@ -27,11 +27,11 @@ oth_team = teams[0] if (teams[0] != team) else teams[1]
 
 # filtrar posesiones
 df_pm = df[["Equipo","Posesion", "Periodo", plusminus_att]][df.Posesion.notnull()]
+
+## POSESSION FILTER
 #df_pm = df[["Equipo","Posesion", plusminus_att]][df.Accion == "At.Posicional"]
-
-
-hot_minutes = ["[2ºTiempo]/[50]", "[2ºTiempo]/[55']", "[2ºTiempo]/[60]"]
-df_pm = df_pm[df_pm.Periodo.isin(hot_minutes)]
+#hot_minutes = ["[2ºTiempo]/[50]", "[2ºTiempo]/[55']", "[2ºTiempo]/[60]"]
+#df_pm = df_pm[df_pm.Periodo.isin(hot_minutes)]
 
 
 
@@ -48,16 +48,7 @@ eff_def    = 1 - (goles_enc / pos_def)
 
 print(pos_attack, goles_marc, pos_def, goles_enc)
 
-'''
-df_alc = df_pm[df_pm.Equipo == "ALCOBENDAS"]
-df_alc = df_alc[df_alc.Posesion =='[Acierto]/[Gol]']
-
-count = 0;
-for i, fila in df_alc.iterrows():
-    if ("05-M. PIZZO" in fila[plusminus_att] and "06-N. TERÉS" in fila[plusminus_att]):
-        count += 1
-print(count)
-'''    
+  
 
 columns_kpi = ["Attack", "AttackPos", "AttackPlusMinus", "AttackRatio", "Def", "DefPos", "DefPlusMinus", "DefRatio"]
 columns_out = ["Player"] + columns_kpi
