@@ -55,14 +55,6 @@ df_pm_out = df_pm_out.append(c1, ignore_index=True)
 df_pm_out = df_pm_out.append(c2, ignore_index=True)
 df_pm_out = df_pm_out.append(c3, ignore_index=True)
 
-
-#Emma - Silvia - Esther
-#Mari - Emma - Esther
-#Pizzl- Emma - Alba
-
-
-
-
 res = 0
 col = ""
 for i, fila in df_pm.iterrows():
