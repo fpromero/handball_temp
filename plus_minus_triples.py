@@ -28,21 +28,30 @@ def local_visitante(teams, match,team):
 import pandas as pd 
 import math
 
+''' opcion multifichero
+
 from glob import glob
 data_path = "C:/Users/FranciscoP.Romero/Onedrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/datos/"
 filtro = "*.csv"
 lst_files = glob(data_path + filtro)
-team = "BERA BERA"
+for file in lst_files: 
 
+'''
+
+team = "BERA BERA"
 columns_kpi = ["Attack", "AttackPos", "AttackRatio",  "AttackPlusMinus", "Def", "DefPos", "DefRatio", "DefPlusMinus"]
 columns_out = ["Match", "Player1", "Player2",  "Player3"] + columns_kpi
 df_pm_out = pd.DataFrame(columns = columns_out )
 
+''' opcion fichero con multipartido '''
+data_path = "C:/Users/FranciscoP.Romero/Desktop/"
+file_name = "1920_BERABERA_FULL"
+df_full = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 
+matches = df_full["Partido"].unique()
 
-
-for file in lst_files: 
-    df = pd.read_csv(file, sep="\t")
+for match in matches: 
+    df = df_full[df_full["Partido"] == match]
     # match features
     teams = df["Equipo"].unique()
     match = df["Partido"].unique()[0]
@@ -59,8 +68,8 @@ for file in lst_files:
     df_pm_out = df_pm_out.append(c3, ignore_index=True)
 
     # filtrar posesiones
-    df_pm = df[["Equipo","Posesion", "Periodo", plusminus_att]][df.Posesion.notnull()]
-    df_pm = df_pm[df.Posesion != "Sancion"]
+    df_pm = df[["Equipo","Posesion", "No Posesion", "Periodo", plusminus_att]][df.Posesion.notnull()]
+    df_pm = df_pm[df["No Posesion"] == False]
     df_pm = df_pm[df_pm[plusminus_att].notnull()]
 
     # calculos generales
