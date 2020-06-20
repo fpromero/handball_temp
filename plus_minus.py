@@ -24,19 +24,8 @@ eff_attack  = goles_marc / pos_attack
 eff_deff    = 1 - (goles_enc / pos_def)
 
 
-'''
-df_alc = df_pm[df_pm.Equipo == "ALCOBENDAS"]
-df_alc = df_alc[df_alc.Posesion =='[Acierto]/[Gol]']
 
-count = 0;
-for i, fila in df_alc.iterrows():
-    if ("05-M. PIZZO" in fila[plusminus_att] and "06-N. TERÉS" in fila[plusminus_att]):
-        count += 1
-print(count)
-'''    
-
-
-df_pm_out = pd.DataFrame(columns= ["Player","PlusMinus", "Appareances"])
+df_pm_out = pd.DataFrame(columns= ["Match", "Player","PMB", "Appareances"])
 
 res = 0
 for i, fila in df_pm.iterrows():
@@ -52,13 +41,13 @@ for i, fila in df_pm.iterrows():
     for player in lst_players:
         player = player.strip()
         if (df_pm_out[df_pm_out.Player == player].shape[0] == 0):
-            df_player = pd.DataFrame([[player,0,0]], columns=["Player","PlusMinus", "Appareances"] )
+            df_player = pd.DataFrame([[player,0,0]], columns=["Player","PMB", "Appareances"] )
             df_pm_out = pd.concat([df_player, df_pm_out])
         df_pm_out.loc[df_pm_out['Player']== player , "PlusMinus"] += res
         df_pm_out.loc[df_pm_out['Player']== player , "Appareances"] += 1
 
 
-df_pm_out.to_excel(data_path + file_name + "_plusminus.xls", columns = ["Player","PlusMinus", "Appareances"])
+df_pm_out.to_excel(data_path + file_name + "_plusminus.xls", columns = ["Player","PMB", "Appareances"])
 
 df_pm_out.plot(x = "Player", y = "PlusMinus", kind='bar')
     
