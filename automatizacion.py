@@ -89,56 +89,7 @@ dict_acc = {"Asistencia":"Assist", "Buena Defensa": "GoodDef",
 df_out = pd.DataFrame(columns= columns_out)
 
 
-## 
-# FUNCIONES
-## 
-def truncate(numero, cifras = 1):
-    posiciones = pow(10.0, cifras)
-    return math.trunc(posiciones * numero) / posiciones
 
-def create_row(match, team, player, role, columns):
-    row_data = [match, team, player, role] 
-    row_data = row_data + ([0] * (len(columns)- len(row_data)))
-    return pd.DataFrame([row_data], columns= columns)
-
-
-def detect_scoring_actions(actions, match, team, df_out):
-    for act in actions:
-        # control multiple action to a single player
-        num_players = act.count(":")
-        num_actions = act.count(",")
-        if (num_players == 1 and  num_actions > 0): 
-            player = act[: act.find(":")].strip()
-            pos_comma = act.find(",")
-            act = act[:pos_comma + 1] + player + ":" + act[pos_comma + 1: ]
-        ## processing
-        a_lst = act.split(",")
-        for a in a_lst:
-            pos = a.find(":")
-            player =  a[: pos].strip()
-            accion = a[pos + 1: ].strip()
-            ## borrar etiquetado ocasional
-            accion = accion.strip("[")
-            accion = accion.strip("]")
-            col = dict_acc.get(accion)
-            if (col is not None):
-                if (df_out[df_out.Player == player].shape[0] == 0):
-                    df_out_aux=create_row(match,team, player, "FP", columns_out)
-                    df_out = pd.concat([df_out_aux, df_out], sort = True)
-                # contar jugada
-                df_out.loc[df_out['Player']== player, col] +=1
-    return df_out
-
-
-
-def register_action(df, col, role, df_out):
-    for i, f in df.iterrows():
-        player = f['Jugador/a'].strip()
-        if (df_out[df_out.Player == player].shape[0] == 0):
-            df_out_aux=create_row(f['Partido'],f['Equipo'],player, role, columns_out)
-            df_out = pd.concat([df_out_aux, df_out], sort = True)
-        df_out.loc[df_out['Player'] == player , col] += 1
-    return df_out
 
 
 #Goals
