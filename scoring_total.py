@@ -174,4 +174,4 @@ columns = ["Player", "Role"] + list(matches)
 df_pvt = pd.pivot_table(bera_bera, values = 'Score', index=['Player', 'Role'], columns = 'Match').reset_index()
 df_pvt.fillna(0, inplace=True)
 df_pvt = df_pvt[df_pvt.Role == "FP"][columns]
-
+df_pvt.to_excel(data_path + "1920_table.xls")
