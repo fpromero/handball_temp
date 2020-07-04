@@ -18,13 +18,15 @@ import pandas as pd
 
 
 
-team = "BERA BERA"
-columns_kpi = ["Attack", "AttackPos", "AttackPlusMinus", "AttackRatio", "Def", "DefPos", "DefPlusMinus", "DefRatio"]
+# attackplusratio
+columns_kpi = ["AttackPlus", "AttackPossesions", "AttackPlusMinus", "AttackPossesionsRatio", 
+               "DefPlus", "DefPossesions", "DefPlusMinus", "DefPossesionsRatio"]
 columns_out = ["Match", "Player"] + columns_kpi
 df_out = pd.DataFrame(columns = columns_out )
 
 ''' opcion fichero con multipartido '''
-data_path = "C:/Users/FranciscoP.Romero/Desktop/"
+data_path = "C:/Users/FranciscoP.Romero/OneDrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/datos/scoring_total/"
+team = "BERA BERA"
 file_name = "1920_BERABERA_FULL"
 df_full = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 
@@ -73,30 +75,31 @@ for match in matches:
                 res = 0
             elif (posesion.find("Acierto") != -1):    
                 res = 1
-            col = "Attack"
+            col = "AttackPlus"
             
         else: 
             if (posesion.find ("Error") != -1):
                 res = 1
             elif (posesion.find("Acierto") != -1):    
                 res = 0
-            col = "Def"
+            col = "DefPlus"
         lst_players = fila[plusminus_att].split(",")
         for player in lst_players:
             player = player.strip()
             if (df_pm_out[(df_pm_out.Player == player)].shape[0] == 0):
                 df_player = pd.DataFrame([[match, player,0,0,0,0,0,0,0,0]], columns = columns_out)
                 df_pm_out = pd.concat([df_player, df_pm_out])
+            
             df_pm_out.loc[df_pm_out['Player']== player , col] += res
-            df_pm_out.loc[df_pm_out['Player']== player , col+"Pos"] += 1        
+            df_pm_out.loc[df_pm_out['Player']== player , col.replace("Plus", "") +"Possesions"] += 1        
  
 
     df_pm_out = df_pm_out.apply(pd.to_numeric, errors='ignore')
     
-    df_pm_out["AttackPlusMinus"] = ((df_pm_out["Attack"]/ df_pm_out["AttackPos"]) - eff_attack)*100
-    df_pm_out["DefPlusMinus"] = ((df_pm_out["Def"]/ df_pm_out["DefPos"]) - eff_def)*100
-    df_pm_out["AttackRatio"] = (df_pm_out["AttackPos"] / pos_attack) * 100
-    df_pm_out["DefRatio"] = (df_pm_out["DefPos"] / pos_def) * 100
+    df_pm_out["AttackPlusMinus"] = ((df_pm_out["AttackPlus"]/ df_pm_out["AttackPossesions"]) - eff_attack)*100
+    df_pm_out["DefPlusMinus"] = ((df_pm_out["DefPlus"]/ df_pm_out["DefPossesions"]) - eff_def)*100
+    df_pm_out["AttackPossesionsRatio"] = (df_pm_out["AttackPossesions"] / pos_attack) * 100
+    df_pm_out["DefPossesionsRatio"] = (df_pm_out["DefPossesions"] / pos_def) * 100
     
     df_matches.append(df_pm_out)
     
