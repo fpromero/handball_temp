@@ -47,16 +47,28 @@ cols_def = ["Steal", "GoodDef", "Block", "DefMistake", "2mJ", "2mBB", "RedBlueCa
 w_def = [1, 0.8, 0.8, -0.8, -0.8, -2, -2]
 
 
-cols_gk_pos =  ["9mSave", "9mOut", "9mBlock", "6mSave", "6mOut", "FBSave", "FBOut",
-            "7mSave", "7mOut","Assist", "Received7m", "Provoke2m", "Steal"]
-cols_gk_neg = ["9mGoal", "6mGoal", "FBGoal", "7mGoal","Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"]
-w_gk = [-1, 1, 0.5, 0.5,
-           -0.6, 1.5, 1,
-           -0.5, 1.5, 1.5, 
-           -0.4, 1.5, 1.5,
+'''
+columns_kpi =  ["9mGoal",   "9mSave", "9mOut", "9mBlock",
+               "6mGoal", "6mSave", "6mOut",
+               "FBGoal" ,  "FBSave", "FBOut",
+               "7mGoal", "7mSave", "7mOut",
+               "Assist", "Received7m", "Provoke2m", "Steal","GoodDef", "Block",
+               "Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"
+               ]
+'''
+w_gk = [-1, 1, 0.5, 0.0,
+           -0.6, 1.5, 0.5,
+           -0.5, 1.5, 0.0, 
+           -0.4, 1.5, 0.0,
            0.85, 1, 0.8, 1, 0, 0,
            -0.8, -0.8, -0.8, -2, -2
            ]
+
+#cols_gk_pos =  ["9mSave", "9mOut", "9mBlock", "6mSave", "6mOut", "FBSave", "FBOut",
+#            "7mSave", "7mOut","Assist", "Received7m", "Provoke2m", "Steal"]
+cols_gk_pos =  ["9mSave", "9mOut" , "6mSave",  "6mOut","FBSave","7mSave","Assist", "Received7m", "Provoke2m", "Steal"]
+cols_gk_neg = ["9mGoal", "6mGoal", "FBGoal", "7mGoal","Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"]
+
 
 
 dict_acc = {"Asistencia":"Assist", "Buena Defensa": "GoodDef", 
