@@ -9,8 +9,8 @@ import pandas as pd
 
 
 # 0. load data
-data_path = "C:/Users/FranciscoP.Romero/OneDrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/scoring_total/"
-file_name = "1920_BERABERA_FULL"
+data_path = "C:/Users/FranciscoP.Romero/Desktop/BERA BERA 20-21/datos/"
+file_name = "200812_BER-ZUA"
 df = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 
 
@@ -173,5 +173,7 @@ bera_bera[["Player", "Score5"]].groupby("Player").sum()
 columns = ["Player", "Role"] + list(matches)
 df_pvt = pd.pivot_table(bera_bera, values = 'Score', index=['Player', 'Role'], columns = 'Match').reset_index()
 df_pvt.fillna(0, inplace=True)
-df_pvt = df_pvt[df_pvt.Role == "FP"][columns]
+#df_pvt = df_pvt[df_pvt.Role == "FP"][columns]
+df_pvt = df_pvt[columns]
 df_pvt.to_excel(data_path + "1920_table.xls")
+

@@ -9,8 +9,8 @@ import pandas as pd
 import math
 
 
-data_path = "C:/Users/FranciscoP.Romero/Onedrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/datos/"
-file_name = "BeraBera-Elche"
+data_path = "C:/Users/FranciscoP.Romero/Desktop/BERA BERA 20-21/datos/"
+file_name = "200812_BER-ZUA"
 df = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 teams = df["Equipo"].unique()
 match = df["Partido"].unique()[0]

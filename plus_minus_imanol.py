@@ -25,9 +25,9 @@ columns_out = ["Match", "Player"] + columns_kpi
 df_out = pd.DataFrame(columns = columns_out )
 
 ''' opcion fichero con multipartido '''
-data_path = "C:/Users/FranciscoP.Romero/OneDrive - Universidad de Castilla-La Mancha/RESEARCH/2005_BERABERA/datos/scoring_total/"
+data_path = "C:/Users/FranciscoP.Romero/Desktop/BERA BERA 20-21/datos/"
+file_name = "200812_BER-ZUA"
 team = "BERA BERA"
-file_name = "1920_BERABERA_FULL"
 df_full = pd.read_csv(data_path + file_name + ".csv", sep="\t")
 
 matches = df_full["Partido"].unique()
@@ -58,8 +58,7 @@ for match in matches:
     eff_attack  = goles_marc / pos_attack
     eff_def    = 1 - (goles_enc / pos_def)
     
-    print(match)
-    print(pos_attack, goles_marc, pos_def, goles_enc)
+    print(match, pos_attack, goles_marc, pos_def, goles_enc)
 
 
 
@@ -111,7 +110,8 @@ df_out[columns_kpi] = df_out[columns_kpi].round()
 
 df_out.to_excel(data_path + file_name + "_plusminus_imanol.xls", columns = columns_out)
 
+#df_out.loc[df_out['AttackPossesions'] < 10, 'AttackPlusMinus'] = 0
 
+#df_x = df_out.iloc(df_out[df_out.AttackPossesions < 10])
 
-    
     

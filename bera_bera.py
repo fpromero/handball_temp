@@ -24,7 +24,7 @@ w = [1.5, -0.75, -1, -1,
            1, -0.7, -0.8,
            1, -1.5, -1.5, 
            1, -1.3, -1.3,
-           0.5, 1, 0.8, 1, 0.8, 0.8,
+           0.85, 1, 0.8, 1, 0.8, 0.8,
            -0.8, -0.8, -0.8, -2, -2
            ]
 
@@ -56,17 +56,17 @@ columns_kpi =  ["9mGoal",   "9mSave", "9mOut", "9mBlock",
                "Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"
                ]
 '''
-w_gk = [-1, 1, 0.5, 0.0,
+w_gk = [-1, 1, 0.25, 0.0,
            -0.6, 1.5, 0.5,
-           -0.5, 1.5, 0.0, 
-           -0.4, 1.5, 0.0,
+           -0.5, 1.5, 0.5, 
+           -0.4, 1.5, 0.5,
            0.85, 1, 0.8, 1, 0, 0,
            -0.8, -0.8, -0.8, -2, -2
            ]
 
 #cols_gk_pos =  ["9mSave", "9mOut", "9mBlock", "6mSave", "6mOut", "FBSave", "FBOut",
 #            "7mSave", "7mOut","Assist", "Received7m", "Provoke2m", "Steal"]
-cols_gk_pos =  ["9mSave", "9mOut" , "6mSave",  "6mOut","FBSave","7mSave","Assist", "Received7m", "Provoke2m", "Steal"]
+cols_gk_pos =  ["9mSave", "9mOut" , "6mSave",  "6mOut","FBSave", "FBOut","7mSave", "7mOut","Assist", "Received7m", "Provoke2m", "Steal"]
 cols_gk_neg = ["9mGoal", "6mGoal", "FBGoal", "7mGoal","Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"]
 
 
