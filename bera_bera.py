@@ -28,10 +28,14 @@ w = [1.5, -0.75, -1, -1,
            -0.8, -0.8, -0.8, -2, -2
            ]
 
-cols_pos = ["9mGoal", "6mGoal", "FBGoal", "7mGoal", "Assist", "Received7m", "Provoke2m", "Steal","GoodDef", "Block"]
-w_pos = [1.5, 1, 1, 1, 0.5, 1, 0.8, 1, 0.8, 0.8]
+cols_pos = ["9mGoal", "6mGoal", "FBGoal", "7mGoal", 
+            "Assist", "Received7m", "Provoke2m", "Steal","GoodDef", "Block"]
+w_pos = [1.5, 1, 1, 1, 
+            0.85, 1, 0.8, 1, 0.8, 0.8]
+
 cols_neg = ["9mSave", "9mOut", "9mBlock", "6mSave", "6mOut", "FBSave", "FBOut",
             "7mSave", "7mOut", "Turnover", "DefMistake",  "2mJ", "2mBB", "RedBlueCard"]
+
 w_neg = [-0.75, -1, -1, -0.7, -0.8, -1.5, -1.5, -1.3, -1.3, -0.8, -0.8, -0.8, -2, -2]
 cols_attack = ["9mGoal",   "9mSave", "9mOut", "9mBlock",
                "6mGoal", "6mSave", "6mOut",
@@ -42,7 +46,7 @@ w_attack = [1.5, -0.75, -1, -1,
            1, -0.7, -0.8,
            1, -1.5, -1.5, 
            1, -1.3, -1.3,
-           0.5, 1, 0.8, -0.8]
+           0.85, 1, 0.8, -0.8]
 cols_def = ["Steal", "GoodDef", "Block", "DefMistake", "2mJ", "2mBB", "RedBlueCard"]
 w_def = [1, 0.8, 0.8, -0.8, -0.8, -2, -2]
 
